@@ -80,11 +80,11 @@ export class SigenFlowCard extends LitElement {
   }
 
   getCardSize() {
-    return 5;
+    return 6;
   }
 
   getGridOptions() {
-    return { rows: 5, columns: 12, min_rows: 4, min_columns: 6 };
+    return { rows: 6, columns: 12, min_rows: 5, min_columns: 6 };
   }
 
   private _scheduleFetch(force: boolean) {
@@ -231,8 +231,12 @@ export class SigenFlowCard extends LitElement {
 
   private _renderGraph(colors: Record<string, string>) {
     const width = 520;
-    const height = 260;
-    const layout = computeSankeyLayout(this._flows, height - 20, 14, 18);
+    const height = 300;
+    // 48 = sankey-svg.ts's MIN_HEIGHT_FOR_VALUE, so even the smallest real
+    // node (e.g. a modest grid import) always gets room to show its name
+    // AND its kWh value -- matching the real mySigen screenshot, where even
+    // small nodes show a value and only the percentage is ever dropped.
+    const layout = computeSankeyLayout(this._flows, height - 20, 14, 48);
     // shift layout down slightly to center vertically if it doesn't fill the height
     const usedHeight = Math.max(
       ...layout.leftNodes.map((n) => n.y1),

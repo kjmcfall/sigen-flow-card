@@ -61,6 +61,22 @@ function centerlinePath(x0: number, y0: number, x1: number, y1: number): string 
  * (space permitting) a "share of this side's total" percentage near the
  * bottom. Smaller nodes (e.g. a modest grid export) simply don't have room
  * for all three -- same as the reference. */
+// Vertical geometry for the three lines of node content. These heights are
+// tuned to the font sizes in sigen-flow-card.ts's stylesheet
+// (.sigen-flow-node-{label,value,pct}) -- change one, check the other, or
+// text starts overlapping/clipping on smaller nodes, which is exactly the
+// bug this comment is here to prevent a repeat of (real nodes -- the
+// battery boxes and the two small grid boxes -- clipped/overlapped before
+// these thresholds accounted for actual text height).
+const PILL_TOP = 8;
+const PILL_H = 16;
+const VALUE_BASELINE = 40; // offset from n.y0
+const PCT_BOTTOM_OFFSET = 10; // offset from n.y1
+
+const MIN_HEIGHT_FOR_PILL = PILL_TOP + PILL_H + 6; // ~30
+const MIN_HEIGHT_FOR_VALUE = VALUE_BASELINE + 8; // ~48 -- room for the value's own line height
+const MIN_HEIGHT_FOR_PCT = VALUE_BASELINE + 18 + PCT_BOTTOM_OFFSET; // ~68 -- value baseline + a full line + pct's offset from the bottom
+
 function nodeContent(
   n: LayoutNode,
   side: "left" | "right",
@@ -75,31 +91,36 @@ function nodeContent(
   const pillW = Math.min(boxWidth - pad * 2, NODE_LABELS[n.key].length * 7 + 20);
   const pct = sideTotal > 0 ? (n.total / sideTotal) * 100 : 0;
 
-  const showValue = h >= 30;
-  const showPct = h >= 55;
+  const showPill = h >= MIN_HEIGHT_FOR_PILL;
+  const showValue = h >= MIN_HEIGHT_FOR_VALUE;
+  const showPct = h >= MIN_HEIGHT_FOR_PCT;
 
   return svg`
     <g>
-      <rect
-        x=${textX}
-        y=${n.y0 + 8}
-        width=${pillW}
-        height="16"
-        rx="8"
-        class="sigen-flow-node-pill"
-      ></rect>
-      <text
-        x=${textX + pillW / 2}
-        y=${n.y0 + 16}
-        text-anchor="middle"
-        dominant-baseline="middle"
-        class="sigen-flow-node-label"
-      >${NODE_LABELS[n.key]}</text>
+      ${
+        showPill
+          ? svg`<rect
+              x=${textX}
+              y=${n.y0 + PILL_TOP}
+              width=${pillW}
+              height=${PILL_H}
+              rx="8"
+              class="sigen-flow-node-pill"
+            ></rect>
+            <text
+              x=${textX + pillW / 2}
+              y=${n.y0 + PILL_TOP + PILL_H / 2}
+              text-anchor="middle"
+              dominant-baseline="middle"
+              class="sigen-flow-node-label"
+            >${NODE_LABELS[n.key]}</text>`
+          : ""
+      }
       ${
         showValue
           ? svg`<text
               x=${textX}
-              y=${n.y0 + 40}
+              y=${n.y0 + VALUE_BASELINE}
               text-anchor="start"
               dominant-baseline="middle"
               class="sigen-flow-node-value"
@@ -110,7 +131,7 @@ function nodeContent(
         showPct
           ? svg`<text
               x=${textX}
-              y=${n.y1 - 10}
+              y=${n.y1 - PCT_BOTTOM_OFFSET}
               text-anchor="start"
               dominant-baseline="middle"
               class="sigen-flow-node-pct"
