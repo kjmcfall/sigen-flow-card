@@ -3,7 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import type { HomeAssistant } from "custom-card-helpers";
 import type { Flow, FlowTotals, NodeKey, Period, SigenFlowCardConfig } from "./types.ts";
 import { DEFAULT_COLORS } from "./const.ts";
-import { fetchFlows } from "./data.ts";
+import { fetchFlows, extractErrorMessage } from "./data.ts";
 import { computeSankeyLayout } from "./sankey-layout.ts";
 import { renderSankey } from "./sankey-svg.ts";
 import "./period-selector.ts";
@@ -114,7 +114,9 @@ export class SigenFlowCard extends LitElement {
       this._lastUpdated = lastUpdated;
     } catch (err) {
       if (token !== this._fetchToken) return;
-      this._error = err instanceof Error ? err.message : String(err);
+      // eslint-disable-next-line no-console
+      console.error("sigen-flow-card: fetch failed", err);
+      this._error = extractErrorMessage(err);
     } finally {
       if (token === this._fetchToken) this._loading = false;
     }

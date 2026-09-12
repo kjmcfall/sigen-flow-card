@@ -78,6 +78,31 @@ export function stepPeriod(period: Period, anchor: Date, direction: -1 | 1): Dat
   return next;
 }
 
+/**
+ * Home Assistant's `hass.callWS()` rejects with a plain `{ code, message }`
+ * object on a backend error -- NOT a JavaScript `Error` instance. Stringifying
+ * that directly (e.g. via `String(err)` or template interpolation) produces
+ * the unhelpful "[object Object]" rather than the actual backend message, so
+ * every catch block around a `callWS`/`fetchFlows` call should go through
+ * this instead of assuming `err` is an `Error`.
+ */
+export function extractErrorMessage(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (err && typeof err === "object") {
+    const anyErr = err as Record<string, unknown>;
+    if (typeof anyErr.message === "string") {
+      return typeof anyErr.code === "string" ? `${anyErr.message} (${anyErr.code})` : anyErr.message;
+    }
+    if (typeof anyErr.code === "string") return `Error: ${anyErr.code}`;
+    try {
+      return JSON.stringify(err);
+    } catch {
+      // fall through
+    }
+  }
+  return String(err);
+}
+
 interface StatisticPoint {
   start: number | string;
   end?: number | string;
