@@ -36,33 +36,33 @@ const dt=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
- */function ft(t){return ut({...t,state:!0,attribute:!1})}const yt={solar:"#F0D264",battery:"#4FD9C4",grid:"#8B93E8",load:"#C79EEA"},_t={day:"Day",week:"Week",month:"Month",year:"Year"},$t=["day","week","month","year"];function mt(t,e=.01){const i=Math.max(0,t.solar),s=Math.max(0,t.batteryCharge),r=Math.max(0,t.batteryDischarge),o=Math.max(0,t.gridImport),n=Math.max(0,t.gridExport),a=Math.max(0,t.load),h=[],l=(t,i,s)=>{s>e&&h.push({from:t,to:i,value:vt(s)})};let c=i,d=a;const p=Math.min(c,d);c-=p,d-=p,l("solar","load",p);let g=s;const u=Math.min(c,g);c-=u,g-=u,l("solar","battery",u);let f=n;const y=Math.min(c,f);f-=y,c-=y,l("solar","grid",y);const _=Math.min(r,d);d-=_,l("battery","load",_);let $=o;const m=Math.min($,d);$-=m,d-=m,l("grid","load",m);if(l("grid","battery",Math.min($,g)),c>e){const t=h.find(t=>"solar"===t.from&&"grid"===t.to);t?t.value=vt(t.value+c):l("solar","grid",c)}return h}function vt(t){return Math.round(1e3*t)/1e3}function bt(t,e,i=1){const s=new Date(e),r=new Date(e);switch(t){case"day":return s.setHours(0,0,0,0),r.setTime(s.getTime()),r.setDate(r.getDate()+1),{start:s,end:r,bucket:"hour"};case"week":{const t=(s.getDay()-i+7)%7;return s.setHours(0,0,0,0),s.setDate(s.getDate()-t),r.setTime(s.getTime()),r.setDate(r.getDate()+7),{start:s,end:r,bucket:"day"}}case"month":return s.setHours(0,0,0,0),s.setDate(1),r.setTime(s.getTime()),r.setMonth(r.getMonth()+1),{start:s,end:r,bucket:"day"};case"year":return s.setHours(0,0,0,0),s.setMonth(0,1),r.setTime(s.getTime()),r.setFullYear(r.getFullYear()+1),{start:s,end:r,bucket:"month"}}}async function wt(t,e,i,s,r=1){const{start:o,end:n,bucket:a}=bt(i,s,r),h=function(t){const e=[{id:t.solar_energy,field:"solar"},{id:t.battery_charge_energy,field:"batteryCharge"},{id:t.battery_discharge_energy,field:"batteryDischarge"},{id:t.grid_import_energy,field:"gridImport"},{id:t.grid_export_energy,field:"gridExport"}];return t.load_energy&&e.push({id:t.load_energy,field:"load"}),e.filter(t=>!!t.id)}(e),l=h.map(t=>t.id),c=await t.callWS({type:"recorder/statistics_during_period",start_time:o.toISOString(),end_time:n.toISOString(),statistic_ids:l,period:a,types:["change"]}),d=new Set;for(const t of l)for(const e of c[t]??[])d.add(new Date(e.start).getTime());const p=Array.from(d).sort((t,e)=>t-e),g=new Map;for(const t of l){const e=new Map;for(const i of c[t]??[])e.set(new Date(i.start).getTime(),i.change??0);g.set(t,e)}const u=p.map(t=>{const e={};for(const{id:i,field:s}of h)e[s]=g.get(i)?.get(t)??0;const i={solar:e.solar??0,batteryCharge:e.batteryCharge??0,batteryDischarge:e.batteryDischarge??0,gridImport:e.gridImport??0,gridExport:e.gridExport??0},s=e.load??function(t){return Math.max(0,t.solar+t.batteryDischarge+t.gridImport-t.batteryCharge-t.gridExport)}(i);return{...i,load:s}}),f=function(t,e=.01){const i=new Map;for(const s of t)for(const t of mt(s,e)){const e=`${t.from}->${t.to}`;i.set(e,(i.get(e)??0)+t.value)}const s=[];for(const[t,r]of i)if(r>e){const[e,i]=t.split("->");s.push({from:e,to:i,value:vt(r)})}return s}(u),y=u.reduce((t,e)=>({solar:t.solar+e.solar,batteryCharge:t.batteryCharge+e.batteryCharge,batteryDischarge:t.batteryDischarge+e.batteryDischarge,gridImport:t.gridImport+e.gridImport,gridExport:t.gridExport+e.gridExport,load:t.load+e.load}),{solar:0,batteryCharge:0,batteryDischarge:0,gridImport:0,gridExport:0,load:0});if(e.battery_soc){const i=t.states[e.battery_soc];i&&(y.batterySoc=Number(i.state))}return{flows:f,totals:y,lastUpdated:p.length?new Date(p[p.length-1]):null}}const xt=["solar","battery","grid"],At=["battery","load","grid"];const Et={solar:"Solar",battery:"Battery",grid:"Grid",load:"Load"};function St(t,e,i,s,r,o){const n=t.y1-t.y0,a=i+10,h=Math.min(s-20,7*Et[t.key].length+20),l=o>0?t.total/o*100:0,c=n>=48,d=n>=68;return W`
+ */function ft(t){return ut({...t,state:!0,attribute:!1})}const yt={solar:"#F0D264",battery:"#4FD9C4",grid:"#8B93E8",load:"#C79EEA"},_t={day:"Day",week:"Week",month:"Month",year:"Year"},$t=["day","week","month","year"];function mt(t,e=.01){const i=Math.max(0,t.solar),s=Math.max(0,t.batteryCharge),r=Math.max(0,t.batteryDischarge),o=Math.max(0,t.gridImport),n=Math.max(0,t.gridExport),a=Math.max(0,t.load),h=[],l=(t,i,s)=>{s>e&&h.push({from:t,to:i,value:vt(s)})};let c=i,d=a;const p=Math.min(c,d);c-=p,d-=p,l("solar","load",p);let g=s;const u=Math.min(c,g);c-=u,g-=u,l("solar","battery",u);let f=n;const y=Math.min(c,f);f-=y,c-=y,l("solar","grid",y);const _=Math.min(r,d);d-=_,l("battery","load",_);let $=o;const m=Math.min($,d);$-=m,d-=m,l("grid","load",m);if(l("grid","battery",Math.min($,g)),c>e){const t=h.find(t=>"solar"===t.from&&"grid"===t.to);t?t.value=vt(t.value+c):l("solar","grid",c)}return h}function vt(t){return Math.round(1e3*t)/1e3}function bt(t,e,i=1){const s=new Date(e),r=new Date(e);switch(t){case"day":return s.setHours(0,0,0,0),r.setTime(s.getTime()),r.setDate(r.getDate()+1),{start:s,end:r,bucket:"hour"};case"week":{const t=(s.getDay()-i+7)%7;return s.setHours(0,0,0,0),s.setDate(s.getDate()-t),r.setTime(s.getTime()),r.setDate(r.getDate()+7),{start:s,end:r,bucket:"day"}}case"month":return s.setHours(0,0,0,0),s.setDate(1),r.setTime(s.getTime()),r.setMonth(r.getMonth()+1),{start:s,end:r,bucket:"day"};case"year":return s.setHours(0,0,0,0),s.setMonth(0,1),r.setTime(s.getTime()),r.setFullYear(r.getFullYear()+1),{start:s,end:r,bucket:"month"}}}async function wt(t,e,i,s,r=1){const{start:o,end:n,bucket:a}=bt(i,s,r),h=function(t){const e=[{id:t.solar_energy,field:"solar"},{id:t.battery_charge_energy,field:"batteryCharge"},{id:t.battery_discharge_energy,field:"batteryDischarge"},{id:t.grid_import_energy,field:"gridImport"},{id:t.grid_export_energy,field:"gridExport"}];return t.load_energy&&e.push({id:t.load_energy,field:"load"}),e.filter(t=>!!t.id)}(e),l=h.map(t=>t.id),c=await t.callWS({type:"recorder/statistics_during_period",start_time:o.toISOString(),end_time:n.toISOString(),statistic_ids:l,period:a,types:["change"]}),d=new Set;for(const t of l)for(const e of c[t]??[])d.add(new Date(e.start).getTime());const p=Array.from(d).sort((t,e)=>t-e),g=new Map;for(const t of l){const e=new Map;for(const i of c[t]??[])e.set(new Date(i.start).getTime(),i.change??0);g.set(t,e)}const u=p.map(t=>{const e={};for(const{id:i,field:s}of h)e[s]=g.get(i)?.get(t)??0;const i={solar:e.solar??0,batteryCharge:e.batteryCharge??0,batteryDischarge:e.batteryDischarge??0,gridImport:e.gridImport??0,gridExport:e.gridExport??0},s=e.load??function(t){return Math.max(0,t.solar+t.batteryDischarge+t.gridImport-t.batteryCharge-t.gridExport)}(i);return{...i,load:s}}),f=function(t,e=.01){const i=new Map;for(const s of t)for(const t of mt(s,e)){const e=`${t.from}->${t.to}`;i.set(e,(i.get(e)??0)+t.value)}const s=[];for(const[t,r]of i)if(r>e){const[e,i]=t.split("->");s.push({from:e,to:i,value:vt(r)})}return s}(u),y=u.reduce((t,e)=>({solar:t.solar+e.solar,batteryCharge:t.batteryCharge+e.batteryCharge,batteryDischarge:t.batteryDischarge+e.batteryDischarge,gridImport:t.gridImport+e.gridImport,gridExport:t.gridExport+e.gridExport,load:t.load+e.load}),{solar:0,batteryCharge:0,batteryDischarge:0,gridImport:0,gridExport:0,load:0});if(e.battery_soc){const i=t.states[e.battery_soc];i&&(y.batterySoc=Number(i.state))}return{flows:f,totals:y,lastUpdated:p.length?new Date(p[p.length-1]):null}}const xt=["solar","battery","grid"],At=["battery","load","grid"];const Et={solar:"Solar",battery:"Battery",grid:"Grid",load:"Load"};function St(t,e,i,s,r,o){const n=t.y1-t.y0,a=i+10,h=Math.min(s-20,7*Et[t.key].length+20),l=o>0?t.total/o*100:0,c=n>=57,d=n>=79;return W`
     <g>
-      ${n>=30?W`<rect
+      ${n>=29?W`<rect
               x=${a}
               y=${t.y0+8}
               width=${h}
-              height=${16}
-              rx="8"
+              height=${15}
+              rx="7.5"
               class="sigen-flow-node-pill"
             ></rect>
             <text
               x=${a+h/2}
-              y=${t.y0+8+8}
+              y=${t.y0+8+7.5}
               text-anchor="middle"
               dominant-baseline="middle"
               class="sigen-flow-node-label"
             >${Et[t.key]}</text>`:""}
       ${c?W`<text
               x=${a}
-              y=${t.y0+40}
+              y=${t.y0+41}
               text-anchor="start"
               dominant-baseline="middle"
               class="sigen-flow-node-value"
             >${function(t,e){return t>=100?`${t.toFixed(0)} ${e}`:t>=10?`${t.toFixed(1)} ${e}`:`${t.toFixed(2)} ${e}`}(t.total,r)}</text>`:""}
       ${d?W`<text
               x=${a}
-              y=${t.y1-10}
+              y=${t.y0+65}
               text-anchor="start"
               dominant-baseline="middle"
               class="sigen-flow-node-pct"
@@ -262,7 +262,7 @@ const dt=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
               as of ${this._lastUpdated.toLocaleString(void 0,{hour:"2-digit",minute:"2-digit",day:"numeric",month:"short"})} — long-term statistics can lag live data by up to ~1 hour
             </div>`:Y}
       </ha-card>
-    `}_renderGraph(t){const e=function(t,e,i=12,s=4){const r=new Map,o=new Map;for(const e of t)r.set(e.from,(r.get(e.from)??0)+e.value),o.set(e.to,(o.get(e.to)??0)+e.value);const n=xt.filter(t=>(r.get(t)??0)>0),a=At.filter(t=>(o.get(t)??0)>0),h=n.reduce((t,e)=>t+(r.get(e)??0),0),l=a.reduce((t,e)=>t+(o.get(e)??0),0),c=Math.max(h,l,.001),d=Math.max(n.length,a.length,1),p=Math.max(e-i*(d-1),s*d)/c,g=(t,e)=>{let r=0;const o=[];for(const n of t){const t=e.get(n)??0,a=Math.max(t*p,s);o.push({key:n,total:t,y0:r,y1:r+a}),r+=a+i}return o},u=g(n,r),f=g(a,o),y=new Map(u.map(t=>[t.key,t])),_=new Map(f.map(t=>[t.key,t])),$=new Map(u.map(t=>[t.key,t.y0])),m=new Map(f.map(t=>[t.key,t.y0])),v=[],b=new Map;for(const e of n){const i=t.filter(t=>t.from===e).sort((t,e)=>a.indexOf(t.to)-a.indexOf(e.to));for(const t of i){const i=y.get(e),s=Math.max(t.value/Math.max(i.total,.001)*(i.y1-i.y0),0),r=$.get(e),o=r+s;$.set(e,o),b.set(t,{y0:r,y1:o})}}const w=new Map;for(const e of a){const i=t.filter(t=>t.to===e).sort((t,e)=>n.indexOf(t.from)-n.indexOf(e.from));for(const t of i){const i=_.get(e),s=Math.max(t.value/Math.max(i.total,.001)*(i.y1-i.y0),0),r=m.get(e),o=r+s;m.set(e,o),w.set(t,{y0:r,y1:o})}}for(const e of t){const t=b.get(e),i=w.get(e);t&&i&&v.push({from:e.from,to:e.to,value:e.value,y0Left:t.y0,y1Left:t.y1,y0Right:i.y0,y1Right:i.y1})}return{leftNodes:u,rightNodes:f,links:v,scale:p}}(this._flows,280,14,48),i=Math.max(...e.leftNodes.map(t=>t.y1),...e.rightNodes.map(t=>t.y1),0),s=Math.max(0,(280-i)/2)+10,r={...e,leftNodes:e.leftNodes.map(t=>({...t,y0:t.y0+s,y1:t.y1+s})),rightNodes:e.rightNodes.map(t=>({...t,y0:t.y0+s,y1:t.y1+s})),links:e.links.map(t=>({...t,y0Left:t.y0Left+s,y1Left:t.y1Left+s,y0Right:t.y0Right+s,y1Right:t.y1Right+s}))};return function(t,e){const{width:i,height:s,colors:r,leftX:o,rightX:n,unit:a,animate:h,idPrefix:l}=e,c=t.links.reduce((t,e)=>Math.max(t,e.value),.001),d=t.leftNodes.reduce((t,e)=>t+e.total,0),p=t.rightNodes.reduce((t,e)=>t+e.total,0),g=[],u=[],f=[],y=[];t.links.forEach((t,e)=>{const i=r[t.from],s=r[t.to],a=`${l}-link-${e}`,d=`${l}-grad-${e}`;if(u.push(W`
+    `}_renderGraph(t){const e=function(t,e,i=12,s=4){const r=new Map,o=new Map;for(const e of t)r.set(e.from,(r.get(e.from)??0)+e.value),o.set(e.to,(o.get(e.to)??0)+e.value);const n=xt.filter(t=>(r.get(t)??0)>0),a=At.filter(t=>(o.get(t)??0)>0),h=n.reduce((t,e)=>t+(r.get(e)??0),0),l=a.reduce((t,e)=>t+(o.get(e)??0),0),c=Math.max(h,l,.001),d=Math.max(n.length,a.length,1),p=Math.max(e-i*(d-1),s*d)/c,g=(t,e)=>{let r=0;const o=[];for(const n of t){const t=e.get(n)??0,a=Math.max(t*p,s);o.push({key:n,total:t,y0:r,y1:r+a}),r+=a+i}return o},u=g(n,r),f=g(a,o),y=new Map(u.map(t=>[t.key,t])),_=new Map(f.map(t=>[t.key,t])),$=new Map(u.map(t=>[t.key,t.y0])),m=new Map(f.map(t=>[t.key,t.y0])),v=[],b=new Map;for(const e of n){const i=t.filter(t=>t.from===e).sort((t,e)=>a.indexOf(t.to)-a.indexOf(e.to));for(const t of i){const i=y.get(e),s=Math.max(t.value/Math.max(i.total,.001)*(i.y1-i.y0),0),r=$.get(e),o=r+s;$.set(e,o),b.set(t,{y0:r,y1:o})}}const w=new Map;for(const e of a){const i=t.filter(t=>t.to===e).sort((t,e)=>n.indexOf(t.from)-n.indexOf(e.from));for(const t of i){const i=_.get(e),s=Math.max(t.value/Math.max(i.total,.001)*(i.y1-i.y0),0),r=m.get(e),o=r+s;m.set(e,o),w.set(t,{y0:r,y1:o})}}for(const e of t){const t=b.get(e),i=w.get(e);t&&i&&v.push({from:e.from,to:e.to,value:e.value,y0Left:t.y0,y1Left:t.y1,y0Right:i.y0,y1Right:i.y1})}return{leftNodes:u,rightNodes:f,links:v,scale:p}}(this._flows,280,14,57),i=Math.max(...e.leftNodes.map(t=>t.y1),...e.rightNodes.map(t=>t.y1),0),s=Math.max(0,(280-i)/2)+10,r={...e,leftNodes:e.leftNodes.map(t=>({...t,y0:t.y0+s,y1:t.y1+s})),rightNodes:e.rightNodes.map(t=>({...t,y0:t.y0+s,y1:t.y1+s})),links:e.links.map(t=>({...t,y0Left:t.y0Left+s,y1Left:t.y1Left+s,y0Right:t.y0Right+s,y1Right:t.y1Right+s}))};return function(t,e){const{width:i,height:s,colors:r,leftX:o,rightX:n,unit:a,animate:h,idPrefix:l}=e,c=t.links.reduce((t,e)=>Math.max(t,e.value),.001),d=t.leftNodes.reduce((t,e)=>t+e.total,0),p=t.rightNodes.reduce((t,e)=>t+e.total,0),g=[],u=[],f=[],y=[];t.links.forEach((t,e)=>{const i=r[t.from],s=r[t.to],a=`${l}-link-${e}`,d=`${l}-grad-${e}`;if(u.push(W`
       <linearGradient id=${d} x1="0" y1="0" x2="1" y2="0">
         <stop offset="0%" stop-color=${i}></stop>
         <stop offset="100%" stop-color=${s}></stop>
@@ -351,19 +351,19 @@ const dt=t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}
       fill: rgba(255, 255, 255, 0.55);
     }
     .sigen-flow-node-label {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 600;
       letter-spacing: 0.02em;
       fill: #1a1a2e;
       text-transform: uppercase;
     }
     .sigen-flow-node-value {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       fill: #1a1a2e;
     }
     .sigen-flow-node-pct {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 500;
       fill: rgba(26, 26, 46, 0.65);
     }

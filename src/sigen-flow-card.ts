@@ -160,19 +160,19 @@ export class SigenFlowCard extends LitElement {
       fill: rgba(255, 255, 255, 0.55);
     }
     .sigen-flow-node-label {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 600;
       letter-spacing: 0.02em;
       fill: #1a1a2e;
       text-transform: uppercase;
     }
     .sigen-flow-node-value {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       fill: #1a1a2e;
     }
     .sigen-flow-node-pct {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 500;
       fill: rgba(26, 26, 46, 0.65);
     }
@@ -232,11 +232,11 @@ export class SigenFlowCard extends LitElement {
   private _renderGraph(colors: Record<string, string>) {
     const width = 520;
     const height = 300;
-    // 48 = sankey-svg.ts's MIN_HEIGHT_FOR_VALUE, so even the smallest real
+    // 57 = sankey-svg.ts's MIN_HEIGHT_FOR_VALUE, so even the smallest real
     // node (e.g. a modest grid import) always gets room to show its name
     // AND its kWh value -- matching the real mySigen screenshot, where even
     // small nodes show a value and only the percentage is ever dropped.
-    const layout = computeSankeyLayout(this._flows, height - 20, 14, 48);
+    const layout = computeSankeyLayout(this._flows, height - 20, 14, 57);
     // shift layout down slightly to center vertically if it doesn't fill the height
     const usedHeight = Math.max(
       ...layout.leftNodes.map((n) => n.y1),

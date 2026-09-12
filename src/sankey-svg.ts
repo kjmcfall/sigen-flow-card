@@ -58,24 +58,39 @@ function centerlinePath(x0: number, y0: number, x1: number, y1: number): string 
 /** Renders a node's label pill / value / share-of-side-total, matching the
  * real mySigen "Energy Statistics" screen: a translucent pill with the node
  * name near the top of the coloured block, a bold kWh value below it, and
- * (space permitting) a "share of this side's total" percentage near the
- * bottom. Smaller nodes (e.g. a modest grid export) simply don't have room
- * for all three -- same as the reference. */
-// Vertical geometry for the three lines of node content. These heights are
-// tuned to the font sizes in sigen-flow-card.ts's stylesheet
-// (.sigen-flow-node-{label,value,pct}) -- change one, check the other, or
-// text starts overlapping/clipping on smaller nodes, which is exactly the
-// bug this comment is here to prevent a repeat of (real nodes -- the
-// battery boxes and the two small grid boxes -- clipped/overlapped before
-// these thresholds accounted for actual text height).
+ * (space permitting) a "share of this side's total" percentage below that.
+ * Smaller nodes (e.g. a modest grid export) simply don't have room for all
+ * three -- same as the reference.
+ *
+ * Every line is positioned top-down, purely as an offset from the PREVIOUS
+ * line's bottom edge (pill -> value -> pct), never from the box's bottom
+ * edge (n.y1). That matters: an earlier version anchored the percentage
+ * from n.y1, which meant its distance from the value line above it shrank
+ * as the box got shorter -- exactly backwards, and exactly what caused a
+ * real overlap bug on a mid-size node. Stacking top-down means a line's
+ * position never depends on how tall the box is, only on whether the box
+ * is tall enough to show it at all (the MIN_HEIGHT_FOR_* gates below,
+ * which include real bottom padding, not just "the text technically fits").
+ */
 const PILL_TOP = 8;
-const PILL_H = 16;
-const VALUE_BASELINE = 40; // offset from n.y0
-const PCT_BOTTOM_OFFSET = 10; // offset from n.y1
+const PILL_H = 15;
+const GAP_PILL_TO_VALUE = 8;
+const VALUE_LINE_H = 20; // approx line box for the 16px bold value text
+const GAP_VALUE_TO_PCT = 6;
+const PCT_LINE_H = 16; // approx line box for the 11px pct text
+const BOTTOM_PAD = 6; // required clearance after the last shown line, before the box edge
 
-const MIN_HEIGHT_FOR_PILL = PILL_TOP + PILL_H + 6; // ~30
-const MIN_HEIGHT_FOR_VALUE = VALUE_BASELINE + 8; // ~48 -- room for the value's own line height
-const MIN_HEIGHT_FOR_PCT = VALUE_BASELINE + 18 + PCT_BOTTOM_OFFSET; // ~68 -- value baseline + a full line + pct's offset from the bottom
+const PILL_BOTTOM = PILL_TOP + PILL_H; // 23
+const VALUE_TOP = PILL_BOTTOM + GAP_PILL_TO_VALUE; // 31
+const VALUE_BOTTOM = VALUE_TOP + VALUE_LINE_H; // 51
+const VALUE_BASELINE = VALUE_TOP + VALUE_LINE_H / 2; // 41
+const PCT_TOP = VALUE_BOTTOM + GAP_VALUE_TO_PCT; // 57
+const PCT_BOTTOM = PCT_TOP + PCT_LINE_H; // 73
+const PCT_BASELINE = PCT_TOP + PCT_LINE_H / 2; // 65
+
+const MIN_HEIGHT_FOR_PILL = PILL_BOTTOM + BOTTOM_PAD; // 29
+const MIN_HEIGHT_FOR_VALUE = VALUE_BOTTOM + BOTTOM_PAD; // 57
+const MIN_HEIGHT_FOR_PCT = PCT_BOTTOM + BOTTOM_PAD; // 79
 
 function nodeContent(
   n: LayoutNode,
@@ -104,7 +119,7 @@ function nodeContent(
               y=${n.y0 + PILL_TOP}
               width=${pillW}
               height=${PILL_H}
-              rx="8"
+              rx="7.5"
               class="sigen-flow-node-pill"
             ></rect>
             <text
@@ -131,7 +146,7 @@ function nodeContent(
         showPct
           ? svg`<text
               x=${textX}
-              y=${n.y1 - PCT_BOTTOM_OFFSET}
+              y=${n.y0 + PCT_BASELINE}
               text-anchor="start"
               dominant-baseline="middle"
               class="sigen-flow-node-pct"
