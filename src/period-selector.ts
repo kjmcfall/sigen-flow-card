@@ -5,13 +5,15 @@ import { PERIODS, PERIOD_LABELS } from "./const.ts";
 import { getPeriodRange, stepPeriod } from "./data.ts";
 
 /**
- * The Day / Week / Month / Year tab bar with `< >` navigation, mirroring the
- * period selector at the top of the mySigen app's flow graph. Deliberately
- * self-contained (not tied to Home Assistant's Energy Dashboard date picker)
- * so the card works standalone for anyone who installs it.
+ * The period control row, matched against a real mySigen "Energy Statistics"
+ * screenshot: a rounded date pill with `‹ ›` navigation on the left, and a
+ * separate rounded dropdown pill (Day/Week/Month/Year) on the right.
+ * Deliberately self-contained (not tied to Home Assistant's Energy
+ * Dashboard date picker) so the card works standalone for anyone who
+ * installs it.
  *
  * Fires a `period-change` CustomEvent with `{ period, anchor }` in `detail`
- * whenever the user changes tab or steps forward/back.
+ * whenever the user changes period or steps forward/back.
  */
 @customElement("sigen-period-selector")
 export class SigenPeriodSelector extends LitElement {
@@ -26,80 +28,90 @@ export class SigenPeriodSelector extends LitElement {
       justify-content: space-between;
       gap: 8px;
       flex-wrap: wrap;
-      padding-bottom: 8px;
+      padding-bottom: 12px;
     }
-    .tabs {
-      display: flex;
-      gap: 4px;
-      background: var(--secondary-background-color, #f0f0f0);
-      border-radius: 999px;
-      padding: 3px;
-    }
-    .tabs button {
-      border: none;
-      background: transparent;
-      padding: 4px 12px;
-      border-radius: 999px;
-      font-size: 0.85em;
-      font-weight: 500;
-      cursor: pointer;
-      color: var(--primary-text-color);
-    }
-    .tabs button.active {
-      background: var(--primary-color, #03a9f4);
-      color: var(--text-primary-color, #fff);
-    }
-    .nav {
+    .date-pill,
+    .period-pill {
       display: flex;
       align-items: center;
-      gap: 4px;
-      font-size: 0.85em;
-      color: var(--secondary-text-color);
+      background: var(--secondary-background-color, #f0f0f0);
+      border-radius: 999px;
+      color: var(--primary-text-color);
     }
-    .nav button {
+    .date-pill {
+      gap: 4px;
+      padding: 4px 6px;
+    }
+    .date-pill button {
       border: none;
       background: none;
       cursor: pointer;
-      color: var(--primary-text-color);
+      color: inherit;
       font-size: 1.1em;
       line-height: 1;
-      padding: 2px 6px;
-      border-radius: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
     }
-    .nav button:hover {
-      background: var(--secondary-background-color, #f0f0f0);
+    .date-pill button:hover {
+      background: rgba(127, 127, 127, 0.15);
     }
-    .nav button:disabled {
+    .date-pill button:disabled {
       opacity: 0.35;
       cursor: default;
     }
     .range-label {
-      min-width: 9em;
+      min-width: 8.5em;
       text-align: center;
+      font-size: 0.9em;
+      font-weight: 500;
+    }
+    .period-pill {
+      position: relative;
+      padding: 0;
+    }
+    .period-pill select {
+      appearance: none;
+      -webkit-appearance: none;
+      border: none;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-weight: 500;
+      font-size: 0.9em;
+      padding: 8px 30px 8px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .period-pill .chevron {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      font-size: 0.7em;
+      opacity: 0.7;
     }
   `;
 
   render() {
     const isCurrent = this._isCurrentPeriod();
     return html`
-      <div class="tabs">
-        ${PERIODS.map(
-          (p) => html`
-            <button
-              class=${p === this.period ? "active" : ""}
-              @click=${() => this._setPeriod(p)}
-            >
-              ${PERIOD_LABELS[p]}
-            </button>
-          `
-        )}
-      </div>
-      <div class="nav">
+      <div class="date-pill">
         <button @click=${() => this._step(-1)} aria-label="Previous ${this.period}">‹</button>
         <span class="range-label">${this._rangeLabel()}</span>
         <button @click=${() => this._step(1)} ?disabled=${isCurrent} aria-label="Next ${this.period}">
           ›
         </button>
+      </div>
+      <div class="period-pill">
+        <select
+          .value=${this.period}
+          @change=${(ev: Event) =>
+            this._setPeriod((ev.target as HTMLSelectElement).value as Period)}
+        >
+          ${PERIODS.map((p) => html`<option value=${p}>${PERIOD_LABELS[p]}</option>`)}
+        </select>
+        <span class="chevron">▾</span>
       </div>
     `;
   }

@@ -154,14 +154,25 @@ export class SigenFlowCard extends LitElement {
       color: var(--secondary-text-color);
       margin-top: 4px;
     }
+    .sigen-flow-node-pill {
+      fill: rgba(255, 255, 255, 0.55);
+    }
     .sigen-flow-node-label {
-      font-size: 11px;
-      fill: var(--primary-text-color);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      fill: #1a1a2e;
+      text-transform: uppercase;
     }
     .sigen-flow-node-value {
-      font-size: 11px;
-      font-weight: 600;
-      fill: var(--secondary-text-color);
+      font-size: 17px;
+      font-weight: 700;
+      fill: #1a1a2e;
+    }
+    .sigen-flow-node-pct {
+      font-size: 12px;
+      font-weight: 500;
+      fill: rgba(26, 26, 46, 0.65);
     }
     .sigen-flow-ribbon {
       transition: opacity 0.3s ease;
@@ -218,8 +229,8 @@ export class SigenFlowCard extends LitElement {
 
   private _renderGraph(colors: Record<string, string>) {
     const width = 520;
-    const height = 220;
-    const layout = computeSankeyLayout(this._flows, height - 20, 14);
+    const height = 260;
+    const layout = computeSankeyLayout(this._flows, height - 20, 14, 18);
     // shift layout down slightly to center vertically if it doesn't fill the height
     const usedHeight = Math.max(
       ...layout.leftNodes.map((n) => n.y1),
@@ -249,9 +260,8 @@ export class SigenFlowCard extends LitElement {
       width,
       height,
       colors: colors as Record<NodeKey, string>,
-      leftX: 130,
-      rightX: width - 130,
-      nodeBoxWidth: 10,
+      leftX: 150,
+      rightX: width - 150,
       unit: "kWh",
       animate: true,
       idPrefix: this._config?.entities.solar_energy?.replace(/[^a-zA-Z0-9]/g, "") ?? "sigen",
