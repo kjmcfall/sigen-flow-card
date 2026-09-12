@@ -150,7 +150,7 @@ export async function fetchFlows(
   const statisticIds = wanted.map((w) => w.id);
 
   const response = (await hass.callWS({
-    type: "history/statistics_during_period",
+    type: "recorder/statistics_during_period",
     start_time: start.toISOString(),
     end_time: end.toISOString(),
     statistic_ids: statisticIds,
