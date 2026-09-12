@@ -40,6 +40,76 @@ export interface SankeyLayout {
  * the left, battery/load/grid on the right) so a general-purpose sankey
  * solver is more machinery than the problem needs.
  */
+/**
+ * Splits `usableHeight` across `keys` proportional to each key's raw value in
+ * `totals`, subject to a `minNodeHeight` floor -- WITHOUT letting that floor
+ * push the total past `usableHeight`.
+ *
+ * A naive `Math.max(raw * scale, minNodeHeight)` (the original approach)
+ * computes `scale` once from the *whole* total and applies it to every node
+ * independently. That's fine as long as no node needs the floor. But the
+ * moment one or more small nodes DO need it, their heights get bumped up
+ * with nothing shrinking to compensate -- the big node(s) keep whatever
+ * `raw * scale` gave them, so the column's total height can end up taller
+ * than `usableHeight`. That was a real bug: a dominant Solar node left
+ * Battery and Grid tiny enough to hit the floor, and the resulting column
+ * overflowed the card's fixed-height SVG canvas, silently clipping the
+ * bottom node (Grid) instead of just cramming its text.
+ *
+ * The fix is the standard "water-filling" approach: repeatedly pin any node
+ * whose proportional share would fall under the floor, remove it from the
+ * pool competing for space, and recompute the scale for the rest against
+ * what's actually left. That guarantees floored nodes get exactly
+ * `minNodeHeight` and the remaining nodes' heights still sum to fill (not
+ * exceed) `usableHeight`, so the column's total height never exceeds what
+ * was asked for -- unless every node needs the floor and even that doesn't
+ * fit (an extreme edge case handled by the fallback below).
+ */
+function computeNodeHeights(
+  keys: NodeKey[],
+  totals: Map<NodeKey, number>,
+  usableHeight: number,
+  minNodeHeight: number
+): Map<NodeKey, number> {
+  const floored = new Set<NodeKey>();
+
+  for (let iter = 0; iter < keys.length; iter++) {
+    const freeKeys = keys.filter((k) => !floored.has(k));
+    if (freeKeys.length === 0) break;
+
+    const flooredHeight = floored.size * minNodeHeight;
+    const remaining = Math.max(usableHeight - flooredHeight, 0);
+    const freeTotal = freeKeys.reduce((s, k) => s + (totals.get(k) ?? 0), 0);
+    if (freeTotal <= 0) break;
+
+    const scale = remaining / freeTotal;
+    let changed = false;
+    for (const k of freeKeys) {
+      const h = (totals.get(k) ?? 0) * scale;
+      if (h < minNodeHeight) {
+        floored.add(k);
+        changed = true;
+      }
+    }
+
+    if (!changed) {
+      const heights = new Map<NodeKey, number>();
+      for (const k of keys) {
+        heights.set(k, floored.has(k) ? minNodeHeight : (totals.get(k) ?? 0) * scale);
+      }
+      return heights;
+    }
+  }
+
+  // Degenerate case: even giving every node exactly the floor doesn't fit
+  // (too many nodes for too little height). Fall back to the floor for
+  // everyone -- the canvas will overflow, but only when asked to show more
+  // nodes than its height can possibly fit at all.
+  const heights = new Map<NodeKey, number>();
+  for (const k of keys) heights.set(k, minNodeHeight);
+  return heights;
+}
+
 export function computeSankeyLayout(
   flows: Flow[],
   height: number,
@@ -62,14 +132,17 @@ export function computeSankeyLayout(
 
   const maxNodes = Math.max(leftKeys.length, rightKeys.length, 1);
   const usableHeight = Math.max(height - gap * (maxNodes - 1), minNodeHeight * maxNodes);
+  // Reported for callers that might want an approximate kWh-per-pixel ruler;
+  // actual per-node heights (below) can deviate from this near the floor.
   const scale = usableHeight / total;
 
   const stack = (keys: NodeKey[], totals: Map<NodeKey, number>): LayoutNode[] => {
+    const heights = computeNodeHeights(keys, totals, usableHeight, minNodeHeight);
     let y = 0;
     const nodes: LayoutNode[] = [];
     for (const k of keys) {
       const raw = totals.get(k) ?? 0;
-      const h = Math.max(raw * scale, minNodeHeight);
+      const h = heights.get(k) ?? minNodeHeight;
       nodes.push({ key: k, total: raw, y0: y, y1: y + h });
       y += h + gap;
     }

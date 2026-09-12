@@ -70,3 +70,38 @@ test("computeSankeyLayout: handles the empty-flows case without throwing", () =>
   assert.equal(layout.rightNodes.length, 0);
   assert.equal(layout.links.length, 0);
 });
+
+test("computeSankeyLayout: a dominant node's neighbours hitting the height floor never pushes the column past the available height", () => {
+  // Regression test for a real bug: a naive "scale = usableHeight / total,
+  // then Math.max(raw * scale, minNodeHeight) per node" approach bumps small
+  // nodes up to the floor without shrinking anything else to compensate. On
+  // a real user's data (a big Solar node dwarfing Battery/Grid), that made
+  // the stacked column taller than the canvas, silently clipping the last
+  // (Grid) box instead of just cramming its text.
+  const lopsided: Flow[] = [
+    { from: "solar", to: "load", value: 29.0 },
+    { from: "solar", to: "battery", value: 11.2 },
+    { from: "solar", to: "grid", value: 7.3 },
+    { from: "battery", to: "load", value: 5.6 },
+  ];
+  const height = 280;
+  const gap = 14;
+  const minNodeHeight = 57;
+  const layout = computeSankeyLayout(lopsided, height, gap, minNodeHeight);
+
+  const maxY1 = Math.max(
+    ...layout.leftNodes.map((n) => n.y1),
+    ...layout.rightNodes.map((n) => n.y1)
+  );
+  assert.ok(
+    maxY1 <= height + 0.5,
+    `stacked column (ends at ${maxY1}) must not exceed the available height (${height})`
+  );
+
+  // The small nodes should still get at least the floor (not squeezed below it).
+  for (const nodes of [layout.leftNodes, layout.rightNodes]) {
+    for (const n of nodes) {
+      assert.ok(n.y1 - n.y0 >= minNodeHeight - 0.5);
+    }
+  }
+});
