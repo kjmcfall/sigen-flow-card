@@ -1,0 +1,32 @@
+# Example Lovelace configuration for sigen-flow-card.
+#
+# Replace every entity_id below with your own -- these are examples matching
+# the entity names produced by the Sigenergy Local Modbus integration's
+# "storage" (plant-level) device, which already aggregates across however
+# many inverters/PV strings you have. Check Developer Tools -> Statistics in
+# your own instance to confirm which of your entities have long-term
+# statistics recorded (that's what this card actually reads).
+
+type: custom:sigen-flow-card
+title: Energy Flow
+default_period: day
+week_start: 1 # 1 = Monday, 0 = Sunday
+entities:
+  solar_energy: sensor.shed_solaris_storage_daily_pv_energy
+  battery_charge_energy: sensor.shed_solaris_storage_daily_battery_charge_energy
+  battery_discharge_energy: sensor.shed_solaris_storage_daily_battery_discharge_energy
+  grid_import_energy: sensor.shed_solaris_storage_daily_grid_import_energy
+  grid_export_energy: sensor.shed_solaris_storage_daily_grid_export_energy
+  # Optional: leave unset and the card derives load from the five entities
+  # above (solar + battery_discharge + grid_import - battery_charge - grid_export).
+  load_energy: sensor.shed_solaris_storage_daily_load_consumption
+  # Optional: shown as a small label on the battery node.
+  battery_soc: sensor.shed_solaris_storage_battery_state_of_charge
+
+# Optional palette override -- defaults are mySigen-inspired
+# (solar amber, battery light blue, grid dark blue, load purple).
+# colors:
+#   solar: "#F5B400"
+#   battery: "#4FC3F7"
+#   grid: "#1A56C4"
+#   load: "#8E5FD6"

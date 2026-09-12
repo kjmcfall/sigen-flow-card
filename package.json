@@ -1,0 +1,38 @@
+{
+  "name": "sigen-flow-card",
+  "version": "0.1.0",
+  "description": "A Home Assistant Lovelace card that recreates the mySigen app's colour-coded energy flow graph (Solar / Battery / Grid → Battery / Load / Grid) for Sigenergy ESS systems, with a Day/Week/Month/Year period selector.",
+  "license": "MIT",
+  "type": "module",
+  "author": "Kevin McFall (kjmcfall)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kjmcfall/sigen-flow-card.git"
+  },
+  "keywords": [
+    "home-assistant",
+    "hacs",
+    "lovelace",
+    "custom-card",
+    "sigenergy",
+    "energy",
+    "sankey"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c -w",
+    "test": "node --test test/*.test.ts"
+  },
+  "dependencies": {
+    "custom-card-helpers": "^1.9.0",
+    "lit": "^3.2.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^26.0.1",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "tslib": "^2.6.3",
+    "typescript": "^5.5.4"
+  }
+}

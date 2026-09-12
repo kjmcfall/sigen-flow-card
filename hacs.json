@@ -1,0 +1,6 @@
+{
+  "name": "Sigenergy Energy Flow Card",
+  "render_readme": true,
+  "filename": "sigen-flow-card.js",
+  "homeassistant": "2024.8.0"
+}
