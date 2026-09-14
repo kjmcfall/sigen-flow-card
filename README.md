@@ -5,8 +5,7 @@ energy flow graph — Solar / Battery / Grid as sources on the left, Battery /
 Load / Grid as destinations on the right — with a **Day / Week / Month / Year**
 period selector, built for Sigenergy ESS systems.
 
-![screenshot placeholder](docs/screenshot.png)
-*(screenshot coming soon — see [Contributing](#contributing))*
+![Sigenergy Energy Flow Card showing a day's Solar/Battery/Grid flows](docs/screenshot.png)
 
 ## Why
 
@@ -169,9 +168,6 @@ tested directly; `src/sigen-flow-card.ts` is the actual custom element.
 
 Issues and PRs welcome — especially:
 
-- A real mySigen app screenshot so the default palette and layout can be
-  checked against the real thing (this card was built from written
-  descriptions of the app rather than a live screenshot).
 - Reports of which Sigenergy integrations/entity-naming schemes you're using,
   so the docs above can cover more of them.
 - If your setup exposes genuine sub-flow sensors (not just the six totals),

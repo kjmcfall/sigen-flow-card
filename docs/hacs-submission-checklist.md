@@ -8,17 +8,15 @@
 - [x] MIT `LICENSE`
 - [x] Built `dist/sigen-flow-card.js` committed (HACS/manual installs read
       this directly — there's no build step on the user's HA instance)
-- [ ] Push to `github.com/kjmcfall/sigen-flow-card` and set the repo
-      description + topics (see below) — this repo doesn't exist on GitHub
-      yet, so this is the first real step
+- [x] Push to `github.com/kjmcfall/sigen-flow-card` and set the repo
+      description + topics (see below)
 - [ ] Cut a tagged **GitHub Release** (e.g. `v0.1.0`) — HACS reads release
       tags for versioning, not raw commits. Without a release, HACS falls
       back to "last 7 characters of the last commit," which works but looks
       unpolished to anyone browsing custom repos.
 - [ ] Add repo topics: `home-assistant`, `hacs`, `lovelace`, `custom-card`,
       `sigenergy`, `energy`, `sankey`
-- [ ] At least one real screenshot or GIF in the README (currently a
-      placeholder — see the open item in README's Contributing section)
+- [x] At least one real screenshot in the README (`docs/screenshot.png`)
 
 Once the above is done, anyone can add it via **HACS → Custom repositories**
 using the repo URL, category "Dashboard" — no further approval needed.

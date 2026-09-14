@@ -1,7 +1,9 @@
 <!--
   Draft for community.home-assistant.io. Suggested category: "Frontend" (or
-  "Share your Projects"). Fill in the [bracketed] bits, attach 1-2
-  screenshots/a GIF, then post under your own account.
+  "Share your Projects"). Attach docs/screenshot.png (or a fresher one from
+  your own dashboard) as a real forum attachment rather than linking it —
+  forum image uploads are more reliable than hotlinking to GitHub, and it
+  lets people click to view it full-size. Post under your own account.
 
   Title suggestion (keep it short, searchable):
   Sigenergy Energy Flow Card — mySigen-style Solar/Battery/Grid flow graph with a period selector
@@ -26,7 +28,7 @@ so I built it.
 
 ### What it looks like
 
-[screenshot / GIF here]
+[attach docs/screenshot.png here]
 
 ### How it works (the honest version)
 
@@ -39,6 +41,10 @@ battery → grid export; battery/grid → whatever load is left), computed at an
 hourly/daily/monthly bucket size depending on the period so a day where the
 battery both charged and discharged doesn't cancel itself out. Full writeup
 in the README if you're curious, along with a worked example from real data.
+
+The colours and layout are trued up against a real mySigen screenshot, but
+I've only tested it against my own system's data — if something looks off
+against yours, let me know.
 
 If your setup does expose real sub-flow sensors, wire them in — the
 allocation model only fills in the gaps.
@@ -59,14 +65,11 @@ submit it to the default HACS store once it's had a bit of real-world use.
 
 ### Feedback wanted
 
-- Screenshots of the real mySigen graph from anyone willing to share one —
-  I built the default colour palette and layout from written descriptions,
-  not a live screenshot, so I'd like to true it up.
 - Which Sigenergy integration/entity-naming you're on, if it's not covered
   in the README yet.
 - Anything that looks wrong in the flow allocation for your own system.
 
-[Your GitHub: kjmcfall]
+— kjmcfall
 
 <!-- Cross-post nudge: also worth linking this thread from
      https://community.home-assistant.io/t/energy-power-flow-with-generation-and-battery-monitoring-live-sankey-charts/863230
